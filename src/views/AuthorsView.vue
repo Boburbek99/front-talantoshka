@@ -1,30 +1,58 @@
 <script setup>
-  import authorsRequests from "@/requests/authorsRequests";
-  import { onBeforeMount, ref } from "vue";
+import authorsRequests from "@/requests/authorsRequests";
+import { onBeforeMount, ref } from "vue";
 
-  let authors=ref([])
-  let authorInfo=ref({})
-  
-  onBeforeMount(async () => {
-    getAllAuthors()
-  });
+let authors=ref([])
+let authorInfo=ref({})
 
-  async function getAllAuthors() {
-    let response = await authorsRequests.getAllAuthors();
-    if (response && response.data) {
-      authors.value = response.data;
-    }
+let updateInfo = ref({})
+let selectedById = ref(null);
+
+onBeforeMount(async () => {
+  getAllAuthors()
+});
+
+async function getAllAuthors() {
+  let response = await authorsRequests.getAllAuthors();
+  if (response && response.data) {
+    authors.value = response.data;
   }
-
-
-  async function addAutor() {
-    const authorAdd = authorInfo.value;
-    const authorData = {
-      ...authorAdd,
-    };
-    let response = await authorsRequests.addAutor(authorData);
-    getAllAuthors()
+}
+function selectAuthor() {
+  const foundAuthor = authors.value.find((author) => author._id === selectedById.value);
+  if (foundAuthor) {
+    updateInfo.value = { ...foundAuthor };
   }
+}
+async function updateAuthor() {
+  if (!selectedById.value) {
+    console.log("No author selected.");
+    return;
+  }
+  let newUpdateInfo = updateInfo.value;
+  const updateData = {
+    ...newUpdateInfo
+  };
+  try {
+    const response = await authorsRequests.updateAuthor(selectedById.value, updateData);
+    getAllAuthors()
+  } catch (error) {
+    console.error("Error updating author:", error);
+  }
+}
+
+async function addAuthor() {
+  const authorAdd = authorInfo.value;
+  const authorData = {
+    ...authorAdd,
+  };
+  let response = await authorsRequests.addAuthor(authorData);
+  getAllAuthors()
+}
+async function removeAuthor(ID) {
+  let response = await authorsRequests.remove(ID);
+  getAllAuthors()
+}
   
 </script>
 <template>
@@ -98,7 +126,7 @@
                     <td>
                     <ul class="action-list">
                       <li>
-                        <button class="btn  btn-danger" >delete</button>
+                        <button class="btn  btn-danger" @click="removeAuthor(author._id)">delete</button>
                       </li>
                     </ul>
                    </td>         
@@ -121,19 +149,14 @@
     </div>
     <div class="row mb-3">
       <div class="col-sm-4">
-        <select class="form-select form-select-sm" aria-label="Small select example">
-            <option selected>Open this select menu</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
+        <select class="form-select form-select-sm" aria-label="Small select example" @change="selectAuthor" v-model="selectedById">
+          <option v-for="update in authors" :key="update._id" :value="update._id">{{ update._id }}</option>
         </select>
       </div>
-    
-    
       <div class="col-sm-4">
         <div class="input-group input-group-sm mb-3">
           <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
-          <input type="text"   class="form-control form-control-lg"   aria-label="Sizing example input" aria-describedby="inputGroup-sizing"  />
+          <input type="text"   class="form-control form-control-lg"   aria-label="Sizing example input" aria-describedby="inputGroup-sizing"  v-model="updateInfo.name" />
         </div>
       </div>
     </div>
@@ -141,8 +164,7 @@
       <div class="col-sm-4">
         <div class="input-group input-group-sm mb-3">
           <span class="input-group-text" id="inputGroup-sizing-sm">Surname</span>
-          <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm"
-          />
+          <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.surname" />
         </div>
       </div>
     
@@ -150,7 +172,7 @@
       <div class="col-sm-4">
         <div class="input-group input-group-sm mb-3">
           <span class="input-group-text" id="inputGroup-sizing-sm">Age</span>
-          <input  type="text"   class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" />
+          <input  type="text"   class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.age" />
         </div>
       </div>
     </div>
@@ -159,18 +181,18 @@
       <div class="col-sm-4">
         <div class="input-group input-group-sm mb-3">
           <span class="input-group-text" id="inputGroup-sizing-sm">Year</span>
-          <input type="text" class="form-control" aria-label="Sizing example input"     aria-describedby="inputGroup-sizing-sm" />
+          <input type="text" class="form-control" aria-label="Sizing example input"     aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.year" />
         </div>
       </div>
    
       <div class="col-sm-4">
         <div class="input-group input-group-sm mb-3">
           <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
-          <input type="Email" class="form-control"  aria-label="Sizing example input"  aria-describedby="inputGroup-sizing-sm" />
+          <input type="Email" class="form-control"  aria-label="Sizing example input"  aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.email" />
         </div>
       </div>
     </div>
-    <button type="button" class="btn btn-primary">Update</button><br>
+    <button type="button" class="btn btn-primary" @click="updateAuthor()">Update</button><br>
 
   </div>
 </template>

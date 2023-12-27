@@ -8,7 +8,7 @@ async getAllAuthors() {
     console.log("Ошибка", error);
   }
 },
-async addAutor(author){
+async addAuthor(author){
   try{
       const response=await axios().post('/author',author);
       return response;
@@ -31,5 +31,14 @@ async getAutorById(id){
   }catch(error){
       console.log('Ошибка',error)
   }
+},
+async remove(id){
+  try{
+      const response=await axios().delete(`/author/${id}`)
+      return response
+  }catch(error){
+      console.log('Ошибка',error)
+  }
 }
+
 };
