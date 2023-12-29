@@ -1,12 +1,19 @@
 <script setup>
-import NavBar from './components/NavBar.vue';
+import NavBar from "@/components/NavBar.vue";
+import { useAuthStore } from "@/stores/authStore.js";
+import { onBeforeMount } from "vue";
+const authService = useAuthStore();
+
+onBeforeMount(() => {
+  authService.checkCookies();
+})
 </script>
 
 <template>
-  <NavBar />
+  <div v-if="authService.isActiveUser">
+    <NavBar />
+  </div>
   <router-view></router-view>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
