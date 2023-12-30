@@ -20,6 +20,9 @@ function logout() {
             <router-link to="/" class="nav-item nav-link text-decoration-none header-nav">
               Author
             </router-link>
+            <router-link to="/collections" class="nav-item nav-link text-decoration-none header-nav">
+              Collections
+            </router-link>
             <router-link to="/admin" class="nav-item nav-link text-decoration-none header-nav">
               Admin
             </router-link>
