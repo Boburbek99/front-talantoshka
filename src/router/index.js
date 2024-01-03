@@ -33,6 +33,12 @@ const router = createRouter({
       component: () => import("@/views/RegistrationView.vue"),
       meta: { requiresUnauth: true },
     },
+    {
+      path: "/author/:id",
+      name: "AuthorInfo",
+      component: () => import("@/views/AuthorInfoView.vue"),
+      meta: { requiresAuth: true },
+    },
   ],
 });
 import { useAuthStore } from "@/stores/authStore.js";

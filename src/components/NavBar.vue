@@ -23,7 +23,8 @@ function logout() {
             <router-link to="/collections" class="nav-item nav-link text-decoration-none header-nav">
               Collections
             </router-link>
-            <router-link to="/admin" class="nav-item nav-link text-decoration-none header-nav">
+            <router-link to="/admin" v-show="userData.role == 'admin'"
+              class="nav-item nav-link text-decoration-none header-nav">
               Admin
             </router-link>
             <router-link to="/login" @click="logout" class="nav-item nav-link text-decoration-none header-nav">

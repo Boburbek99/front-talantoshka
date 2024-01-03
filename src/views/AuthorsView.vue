@@ -1,6 +1,7 @@
 <script setup>
 import authorsRequests from "@/requests/authorsRequests";
 import { onBeforeMount, ref } from "vue";
+import { useRouter } from 'vue-router';
 
 let authors = ref([])
 let authorInfo = ref({})
@@ -40,7 +41,6 @@ async function updateAuthor() {
     console.error("Error updating author:", error);
   }
 }
-
 async function addAuthor() {
   const authorAdd = authorInfo.value;
   const authorData = {
@@ -52,6 +52,11 @@ async function addAuthor() {
 async function removeAuthor(ID) {
   let response = await authorsRequests.remove(ID);
   getAllAuthors()
+}
+const router = useRouter();
+
+function authorDeteil(id) {
+  router.push({ name: 'AuthorInfo', params: { id: id } })
 }
 
 </script>
@@ -141,7 +146,7 @@ async function removeAuthor(ID) {
                   <td>{{ author.year }}</td>
                   <td>{{ author.email }}</td>
                   <td>
-                    <button class="btn btn-primary">Views</button>
+                    <button class="btn btn-primary" @click="authorDeteil(author._id)">Views</button>
                   </td>
                 </tr>
 
