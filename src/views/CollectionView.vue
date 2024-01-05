@@ -1,6 +1,8 @@
 <script setup>
 import authorsRequests from "@/requests/authorsRequests";
 import collectionsRequest from "@/requests/collectionsRequests";
+import tagsRequests from "@/requests/tagsRequests.js"
+import Multiselect from '@vueform/multiselect'
 import { onBeforeMount, ref } from "vue";
 
 let newCollection = ref({})
@@ -117,7 +119,12 @@ async function updateCollection() {
                 </div>
             </div>
         </div>
-
+        <div class="row mb-3">
+            <div class="input-group mb-3">
+                <input type="file" class="form-control" id="inputGroupFile02">
+                <label class="input-group-text" for="inputGroupFile02">Upload</label>
+            </div>
+        </div>
         <button type="button" class="btn btn-primary" @click="addCollection">Add</button><br>
 
 

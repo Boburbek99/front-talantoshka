@@ -39,6 +39,12 @@ const router = createRouter({
       component: () => import("@/views/AuthorInfoView.vue"),
       meta: { requiresAuth: true },
     },
+    {
+      path: "/tag",
+      name: "tags",
+      component: () => import("@/views/TagsView.vue"),
+      meta: { requiresAuth: true },
+    },
   ],
 });
 import { useAuthStore } from "@/stores/authStore.js";
