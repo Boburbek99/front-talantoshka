@@ -3,11 +3,16 @@ import authorsRequests from "@/requests/authorsRequests";
 import { onBeforeMount, ref } from "vue";
 import { useRouter } from 'vue-router';
 
+import Modal from '@/components/Modal.vue';
+
 let authors = ref([])
 let authorInfo = ref({})
 
 let updateInfo = ref({})
 let selectedById = ref(null);
+
+let createOrAddModalShow = ref(false)
+let createOrUpdateModalShow = ref(false)
 
 onBeforeMount(async () => {
   getAllAuthors()
@@ -59,57 +64,69 @@ function authorDeteil(id) {
   router.push({ name: 'AuthorInfo', params: { id: id } })
 }
 
+//===============Modal================
+
+function open() {
+  createOrAddModalShow.value = true
+}
+function update() {
+  createOrUpdateModalShow.value = true
+}
+
 </script>
 <template>
   <div class="container">
-    <h1>Page Auhtors</h1>
-    <div class="row mb-3">
-      <div class="col-sm-4">
-        <div class="input-group input-group-sm mb-3">
-          <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
-          <input type="text" class="form-control form-control-lg" aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-sm" v-model="authorInfo.name" />
-        </div>
-      </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col-sm-4">
-        <div class="input-group input-group-sm mb-3">
-          <span class="input-group-text" id="inputGroup-sizing-sm">Surname</span>
-          <input type="text" class="form-control" aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-sm" v-model="authorInfo.surname" />
-        </div>
-      </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col-sm-4">
-        <div class="input-group input-group-sm mb-3">
-          <span class="input-group-text" id="inputGroup-sizing-sm">Age</span>
-          <input type="text" class="form-control" aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-sm" v-model="authorInfo.age" />
-        </div>
-      </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col-sm-4">
-        <div class="input-group input-group-sm mb-3">
-          <span class="input-group-text" id="inputGroup-sizing-sm">Year</span>
-          <input type="text" class="form-control" aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-sm" v-model="authorInfo.year" />
-        </div>
-      </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col-sm-4">
-        <div class="input-group input-group-sm mb-3">
-          <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
-          <input type="Email" class="form-control" aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-sm" v-model="authorInfo.email" />
-        </div>
-      </div>
-    </div>
-    <button type="button" class="btn btn-primary" @click="addAuthor">Add</button><br>
 
+    <h1>Page Auhtors</h1>
+    <Modal v-model="createOrAddModalShow" title="Add author" class="d-none">
+      <div class="row mb-3">
+        <div class="col-sm-4">
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
+            <input type="text" class="form-control form-control-lg" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" v-model="authorInfo.name" />
+          </div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-sm-4">
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-sm">Surname</span>
+            <input type="text" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" v-model="authorInfo.surname" />
+          </div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-sm-4">
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-sm">Age</span>
+            <input type="text" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" v-model="authorInfo.age" />
+          </div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-sm-4">
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-sm">Year</span>
+            <input type="text" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" v-model="authorInfo.year" />
+          </div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-sm-4">
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
+            <input type="email" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" v-model="authorInfo.email" />
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" @click="addAuthor">Save</button><br>
+    </Modal>
+    <button class="btn btn-primary mt-5 mb-5" @click="open">Add author</button>
     <!-- Rest of your code... -->
 
     <div class="row">
@@ -156,59 +173,61 @@ function authorDeteil(id) {
         </div>
       </div>
     </div>
-    <div class="row mb-3">
-      <div class="col-sm-4">
-        <select class="form-select form-select-sm" aria-label="Small select example" @change="selectAuthor"
-          v-model="selectedById">
-          <option v-for="update in authors" :key="update._id" :value="update._id">{{ update._id }}</option>
-        </select>
-      </div>
-      <div class="col-sm-4">
-        <div class="input-group input-group-sm mb-3">
-          <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
-          <input type="text" class="form-control form-control-lg" aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing" v-model="updateInfo.name" />
+    <Modal v-model="createOrUpdateModalShow" title="Update auhtor Info" class="d-none">
+      <div class="row mb-3">
+        <div class="col-sm-4">
+          <select class="form-select form-select-sm" aria-label="Small select example" @change="selectAuthor"
+            v-model="selectedById">
+            <option v-for="update in authors" :key="update._id" :value="update._id">{{ update._id }}</option>
+          </select>
+        </div>
+        <div class="col-sm-4">
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
+            <input type="text" class="form-control form-control-lg" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing" v-model="updateInfo.name" />
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col-sm-4">
-        <div class="input-group input-group-sm mb-3">
-          <span class="input-group-text" id="inputGroup-sizing-sm">Surname</span>
-          <input type="text" class="form-control" aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.surname" />
+      <div class="row mb-3">
+        <div class="col-sm-4">
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-sm">Surname</span>
+            <input type="text" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.surname" />
+          </div>
         </div>
-      </div>
 
 
-      <div class="col-sm-4">
-        <div class="input-group input-group-sm mb-3">
-          <span class="input-group-text" id="inputGroup-sizing-sm">Age</span>
-          <input type="text" class="form-control" aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.age" />
-        </div>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col-sm-4">
-        <div class="input-group input-group-sm mb-3">
-          <span class="input-group-text" id="inputGroup-sizing-sm">Year</span>
-          <input type="text" class="form-control" aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.year" />
+        <div class="col-sm-4">
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-sm">Age</span>
+            <input type="text" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.age" />
+          </div>
         </div>
       </div>
 
-      <div class="col-sm-4">
-        <div class="input-group input-group-sm mb-3">
-          <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
-          <input type="Email" class="form-control" aria-label="Sizing example input"
-            aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.email" />
+      <div class="row mb-3">
+        <div class="col-sm-4">
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-sm">Year</span>
+            <input type="text" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.year" />
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="input-group input-group-sm mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
+            <input type="email" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.email" />
+          </div>
         </div>
       </div>
-    </div>
-    <button type="button" class="btn btn-primary" @click="updateAuthor()">Update</button><br>
-
+      <button type="button" class="btn btn-primary" @click="updateAuthor()">Update</button><br>
+    </Modal>
+    <button class="btn btn-primary mt-5 mb-5" @click="update">Update author info</button>
   </div>
 </template>
 
