@@ -2,11 +2,19 @@
 import authorsRequests from "@/requests/authorsRequests";
 import collectionsRequest from "@/requests/collectionsRequests";
 import tagsRequests from "@/requests/tagsRequests.js"
+import '@vueform/multiselect/themes/default.scss'
+
 import Multiselect from '@vueform/multiselect'
 import { onBeforeMount, ref } from "vue";
+import Modal from '@/components/Modal.vue';
 
 let newCollection = ref({})
 let updateInfo = ref({})
+let tags = ref([]);
+let sellectedTag = ref([])
+
+let createOrAddModalShow = ref(false)
+let createOrUpdateModalShow = ref(false)
 
 let authors = ref([]);
 let collections = ref([]);
@@ -17,6 +25,7 @@ let selectedUpdate = ref(null);
 onBeforeMount(async () => {
     await getAllCollections();
     await getAllAuthors();
+    await getAllTags()
 });
 
 async function getAllAuthors() {
@@ -34,9 +43,11 @@ async function getAllCollections() {
 }
 
 async function addCollection() {
-    let newObJect = newCollection.value;
-    let response = await collectionsRequest.addCollection(newObJect);
+    let tags = sellectedTag.value;
+    let newCollect = newCollection.value;
+    let response = await collectionsRequest.addCollection(newCollect);
     await getAllCollections();
+
 }
 async function deletedCollection(collectionID) {
     let response = await collectionsRequest.removeCollection(collectionID);
@@ -68,67 +79,93 @@ async function updateCollection() {
     }
 }
 
+function open() {
+    createOrAddModalShow.value = true
+}
+function update() {
+    createOrUpdateModalShow.value = true
+}
+// ============tags===============
+
+async function getAllTags() {
+
+    const response = await tagsRequests.getAllTags()
+    tags.value = response.data?.map(tag => { return { label: tag.name, value: tag._id } })
+}
+
 </script>
 
 <template>
     <div class="container">
-        <h1>Page Auhtors</h1>
-        <div class="row mb-3">
-            <div class="col-sm-4">
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
-                    <input type="text" class="form-control form-control-lg" aria-label="Sizing example input"
-                        aria-describedby="inputGroup-sizing-sm" v-model="newCollection.name" />
-                </div>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-sm-4">
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm">Description</span>
-                    <input type="text" class="form-control" aria-label="Sizing example input"
-                        aria-describedby="inputGroup-sizing-sm" v-model="newCollection.description" />
-                </div>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-sm-4">
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm">Old Price</span>
-                    <input type="text" class="form-control" aria-label="Sizing example input"
-                        aria-describedby="inputGroup-sizing-sm" v-model="newCollection.newPrice" />
-                </div>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-sm-4">
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm">New Price</span>
-                    <input type="text" class="form-control" aria-label="Sizing example input"
-                        aria-describedby="inputGroup-sizing-sm" v-model="newCollection.oldPrice" />
-                </div>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-sm-4">
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm">Author</span>
-                    <select @change="getAllAuthors" v-model="newCollection.author" id="authors">
-                        <option v-for="author in authors" :key="author._id" :value="author._id">{{ author.name }}</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="input-group mb-3">
-                <input type="file" class="form-control" id="inputGroupFile02">
-                <label class="input-group-text" for="inputGroupFile02">Upload</label>
-            </div>
-        </div>
-        <button type="button" class="btn btn-primary" @click="addCollection">Add</button><br>
 
+        <h1>Page Collections</h1>
+        <Modal v-model="createOrAddModalShow" buttonText="Добавить запись" title="Add collection" class="d-none">
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
+                        <input type="text" class="form-control form-control-lg" aria-label="Sizing example input"
+                            aria-describedby="inputGroup-sizing-sm" v-model="newCollection.name" />
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Description</span>
+                        <input type="text" class="form-control" aria-label="Sizing example input"
+                            aria-describedby="inputGroup-sizing-sm" v-model="newCollection.description" />
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Old Price</span>
+                        <input type="text" class="form-control" aria-label="Sizing example input"
+                            aria-describedby="inputGroup-sizing-sm" v-model="newCollection.newPrice" />
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">New Price</span>
+                        <input type="text" class="form-control" aria-label="Sizing example input"
+                            aria-describedby="inputGroup-sizing-sm" v-model="newCollection.oldPrice" />
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Author</span>
+                        <select @change="getAllAuthors" v-model="newCollection.author" id="authors">
+                            <option v-for="author in authors" :key="author._id" :value="author._id">{{ author.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <div class="input-group input-group-sm mb-3">
+                        <Multiselect v-model="newCollection.tag" mode="tags" :close-on-select="false" :searchable="true"
+                            :options="tags">
+                        </Multiselect>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="input-group mb-3">
+                    <input type="file" class="form-control" id="inputGroupFile02">
+                    <label class="input-group-text" for="inputGroupFile02">Upload</label>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" @click="addCollection">Save</button><br>
+        </Modal>
 
-        <!-- Rest of your code... -->
+        <button class="btn btn-primary mt-5 mb-5" @click="open">Add Collection</button>
 
         <div class="row">
             <div class="col-md-offset-1 col-md-10">
@@ -143,6 +180,7 @@ async function updateCollection() {
                                     <th>Description</th>
                                     <th>New Price</th>
                                     <th>Old Price</th>
+                                    <th>Tags</th>
                                     <th>Author</th>
                                 </tr>
                             </thead>
@@ -161,6 +199,10 @@ async function updateCollection() {
                                     <td>{{ collection.description }}</td>
                                     <td>{{ collection.newPrice }}</td>
                                     <td>{{ collection.oldPrice }}</td>
+                                    <td> <span v-for="(tag, index) in collection.tag" :key="index">
+                                            {{ tags.find(t => t.value === tag)?.label }}
+                                            <!-- Assuming tags is an array of objects with label and value properties -->
+                                        </span></td>
                                     <td>{{ authors.find(a => a._id == collection.author)?.name }}</td>
                                 </tr>
                             </tbody>
@@ -169,63 +211,76 @@ async function updateCollection() {
                 </div>
             </div>
         </div>
-        <div class="row mb-3">
-            <div class="col-sm-4">
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm">Collections</span>
-                    <select class="form-select form-select-sm" aria-label="Small select example" @change="selectCollection"
-                        v-model="collectionID">
-                        <option v-for="update in collections" :key="update._id" :value="update._id">{{ update.name }}
-                        </option>
-                    </select>
+        <Modal v-model="createOrUpdateModalShow" buttonText="Добавить запись" title="Update collection" class="d-none">
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Collections</span>
+                        <select class="form-select form-select-sm" aria-label="Small select example"
+                            @change="selectCollection" v-model="collectionID">
+                            <option v-for="update in collections" :key="update._id" :value="update._id">{{ update.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
+                        <input type="text" class="form-control form-control-lg" aria-label="Sizing example input"
+                            aria-describedby="inputGroup-sizing" v-model="updateInfo.name" />
+                    </div>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
-                    <input type="text" class="form-control form-control-lg" aria-label="Sizing example input"
-                        aria-describedby="inputGroup-sizing" v-model="updateInfo.name" />
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Description</span>
+                        <input type="text" class="form-control" aria-label="Sizing example input"
+                            aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.description" />
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-sm-4">
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm">Description</span>
-                    <input type="text" class="form-control" aria-label="Sizing example input"
-                        aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.description" />
+
+
+                <div class="col-sm-4">
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">New Price</span>
+                        <input type="text" class="form-control" aria-label="Sizing example input"
+                            aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.newPrice" />
+                    </div>
                 </div>
             </div>
 
-
-            <div class="col-sm-4">
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm">New Price</span>
-                    <input type="text" class="form-control" aria-label="Sizing example input"
-                        aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.newPrice" />
+            <div class="row mb-3">
+                <div class="col-sm-4">
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Old Price</span>
+                        <input type="text" class="form-control" aria-label="Sizing example input"
+                            aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.oldPrice" />
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="row mb-3">
-            <div class="col-sm-4">
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm">Old Price</span>
-                    <input type="text" class="form-control" aria-label="Sizing example input"
-                        aria-describedby="inputGroup-sizing-sm" v-model="updateInfo.oldPrice" />
+                <div class="col-sm-4">
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Author</span>
+                        <select @change="getAllAuthors" v-model="updateInfo.author" id="authors">
+                            <option v-for="author in authors" :key="author._id" :value="author._id">{{ author.name }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-
-            <div class="col-sm-4">
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm">Author</span>
-                    <select @change="getAllAuthors" v-model="updateInfo.author" id="authors">
-                        <option v-for="author in authors" :key="author._id" :value="author._id">{{ author.name }}</option>
-                    </select>
+                <div class="row mb-3">
+                    <div class="col-sm-4">
+                        <div class="input-group input-group-sm mb-3">
+                            <Multiselect v-model="updateInfo.tag" mode="tags" :close-on-select="false" :searchable="true"
+                                :options="tags">
+                            </Multiselect>
+                        </div>
+                    </div>
                 </div>
+                <button type="button" class="btn btn-primary" @click="updateCollection">Save</button><br>
             </div>
-            <button type="button" class="btn btn-primary" @click="updateCollection">Update collection</button><br>
-        </div>
+        </Modal>
+        <button class="btn btn-primary mt-5 mb-5" @click="update">Update Collection</button>
     </div>
 </template>
 

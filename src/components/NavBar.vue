@@ -23,6 +23,9 @@ function logout() {
             <router-link to="/collections" class="nav-item nav-link text-decoration-none header-nav">
               Collections
             </router-link>
+            <router-link to="/tag" class="nav-item nav-link text-decoration-none header-nav">
+              Tag
+            </router-link>
             <router-link to="/admin" v-show="userData.role == 'admin'"
               class="nav-item nav-link text-decoration-none header-nav">
               Admin
