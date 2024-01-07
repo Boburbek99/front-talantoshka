@@ -18,7 +18,7 @@ export default defineConfig(() => {
         '@': resolve(__dirname, 'src'),
       },
     },
-  
+
     define: {
       'process.env': Object.keys(env).reduce((acc, key) => {
         acc[key] = env[key];
