@@ -5,13 +5,12 @@ import tagsRequests from "@/requests/tagsRequests.js"
 import '@vueform/multiselect/themes/default.scss'
 
 import Multiselect from '@vueform/multiselect'
-import { onBeforeMount, ref, reactive } from "vue";
+import { onBeforeMount, ref } from "vue";
 import Modal from '@/components/Modal.vue';
 import Text from '../components/Form/Text.vue';
 
 let tags = ref([]);
-let sellectedTag = ref([])
-let requestNewsItem = ref({});
+let requestItem = ref({});
 
 let createOrAddModalShow = ref(false)
 
@@ -48,24 +47,23 @@ async function deletedCollection(collectionID) {
 async function update(id) {
     createOrAddModalShow.value = true
     const foundCollection = collections.value.find((collection) => collection._id == id);
-    console.log(foundCollection, "foundCollection")
     if (foundCollection) {
-        requestNewsItem.value = { ...foundCollection };
+        requestItem.value = { ...foundCollection };
 
     }
 }
 
 async function save() {
 
-    let newCollect = requestNewsItem.value;
-    let newUpdate = requestNewsItem.value;
+    let newCollect = requestItem.value;
+    let newUpdate = requestItem.value;
 
     const updatedData = {
         ...newUpdate
     };
-    if (requestNewsItem.value._id) {
+    if (requestItem.value._id) {
         try {
-            const response = await collectionsRequest.updateCollection(requestNewsItem.value._id, updatedData);
+            const response = await collectionsRequest.updateCollection(requestItem.value._id, updatedData);
             await getAllCollections()
             await getAllAuthors();
         } catch (error) {
@@ -81,13 +79,10 @@ async function save() {
 
 function addOpen() {
     createOrAddModalShow.value = true
-    requestNewsItem.value = {}
+    requestItem.value = {}
 
 }
-function clearForm() {
-    requestNewsItem.value = {}
-    console.log('clerForm')
-}
+
 
 // ============tags===============
 
@@ -103,18 +98,17 @@ async function getAllTags() {
     <div class="container">
 
         <h1>Page Collections</h1>
-        <Modal @click="clearForm" v-model="createOrAddModalShow" buttonText="Добавить запись" title="Add collection"
-            class="d-none">
-            <Text v-model="requestNewsItem.name" label="Namae"></Text>
-            <Text v-model="requestNewsItem.description" label="Description"></Text>
-            <Text v-model="requestNewsItem.oldPrice" label="Old price"></Text>
-            <Text v-model="requestNewsItem.newPrice" label="New Price"></Text>
+        <Modal v-model="createOrAddModalShow" buttonText="Добавить запись" title="Add collection" class="d-none">
+            <Text v-model="requestItem.name" label="Namae"></Text>
+            <Text v-model="requestItem.description" label="Description"></Text>
+            <Text v-model="requestItem.oldPrice" label="Old price"></Text>
+            <Text v-model="requestItem.newPrice" label="New Price"></Text>
 
             <div class="row mb-3">
                 <div class="col-sm-4">
                     <div class="input-group input-group-sm mb-3">
                         <span class="input-group-text" id="inputGroup-sizing-sm">Author</span>
-                        <select @change="getAllAuthors" v-model="requestNewsItem.author" id="authors">
+                        <select @change="getAllAuthors" v-model="requestItem.author" id="authors">
                             <option v-for="author in authors" :key="author._id" :value="author._id">{{ author.name }}
                             </option>
                         </select>
@@ -124,7 +118,7 @@ async function getAllTags() {
             <div class="row mb-3">
                 <div class="col-sm-4">
                     <div class="input-group input-group-sm mb-3">
-                        <Multiselect v-model="requestNewsItem.tag" mode="tags" :close-on-select="false" :searchable="true"
+                        <Multiselect v-model="requestItem.tag" mode="tags" :close-on-select="false" :searchable="true"
                             :options="tags">
                         </Multiselect>
                     </div>
@@ -144,7 +138,7 @@ async function getAllTags() {
         <div class="row">
             <div class="col-md-offset-1 col-md-10">
                 <div class="panel">
-                    <div class="panel-body table-responsive">
+                    <div class="panel-body ">
                         <table class="table">
                             <thead>
                                 <tr>

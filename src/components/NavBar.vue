@@ -34,7 +34,10 @@ function logout() {
               Logout
             </router-link>
           </ul>
-          <div class="panelUser">{{ userData.role }}/{{ userData.login }}</div>
+          <router-link to="/profile" class="nav-item nav-link text-decoration-none header-nav">
+            <div class="panelUser">{{ userData.role }}/{{ userData.login }}</div>
+          </router-link>
+
         </div>
       </div>
     </nav>

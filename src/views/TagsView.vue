@@ -2,10 +2,12 @@
 import tagsRequests from "@/requests/tagsRequests.js"
 import { onBeforeMount, ref } from "vue";
 
+import Modal from '@/components/Modal.vue';
+
+let requestItem = ref({});
+let createOrAddModalShow = ref(false)
 
 const tags = ref({});
-let editTag = ref([])
-
 
 onBeforeMount(async () => {
     await getAllTags()
@@ -17,38 +19,57 @@ async function getAllTags() {
     const response = await tagsRequests.getAllTags()
     tags.value = response.data;
 }
+
+function update(id) {
+    createOrAddModalShow.value = true
+    const foundCollection = tags.value.find((collection) => collection._id == id);
+    if (foundCollection) {
+        requestItem.value = { ...foundCollection }
+    }
+}
+
 async function addTag() {
-    const tagData = { ...tags.value }
-    const response = await tagsRequests.addTag(tagData)
-    getAllTags()
+
+    let updateTag = requestItem.value;
+    if (requestItem.value._id) {
+        const response = await tagsRequests.updateTag(requestItem.value._id, updateTag)
+        getAllTags()
+    }
+    else {
+        const response = await tagsRequests.addTag(updateTag)
+        getAllTags()
+    }
+    createOrAddModalShow.value = false;
 }
 async function deleteTag(tagById) {
     const response = await tagsRequests.removeTag(tagById)
     getAllTags()
 }
-async function updateTag(id) {
-    let update = editTag.value
-    const updateData = {
-        ...update
-    }
-    const response = await tagsRequests.updateTag(id, updateData)
-    getAllTags()
+
+function addOpen() {
+    createOrAddModalShow.value = true
+    requestItem.value = {}
+
 }
 
 </script>
 
 <template>
     <div class="row mb-3 mt-5 mx-auto">
-        <div class="col-sm-4">
-            <div class="input-group input-group-sm mb-3">
-                <span class="input-group-text" id="inputGroup-sizing-sm">Tags</span>
-                <input type="text" class="form-control" aria-label="Sizing example input"
-                    aria-describedby="inputGroup-sizing-sm" v-model="tags.name" />
+        <Modal v-model="createOrAddModalShow" buttonText="Добавить запись" title="Добавить теги" class="d-none">
+            <div class="col-sm-4">
+                <div class="input-group input-group-sm mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-sm">Теги</span>
+                    <input type="text" class="form-control" aria-label="Sizing example input"
+                        aria-describedby="inputGroup-sizing-sm" v-model="requestItem.name" />
+                </div>
             </div>
             <div class="btn-tags">
-                <button type="button" class="btn btn-primary" @click="addTag">Add</button>
+                <button type="button" class="btn btn-primary" @click="addTag">Сохранить</button>
             </div>
-        </div>
+        </Modal>
+        <button class="btn btn-primary mt-5 mb-5" @click="addOpen">Добавить</button>
+
         <div class="row">
             <div class="col-md-offset-1 col-md-10">
                 <div class="panel">
@@ -56,19 +77,19 @@ async function updateTag(id) {
                         <table class="table">
 
                             <thead>
-                                <th>Tags</th>
+                                <th>Теги</th>
                             </thead>
                             <tbody>
                                 <tr v-for="tag in tags" :key="tag._id">
                                     <td>{{ tag.name }}</td>
                                     <td><button type="button" class="btn btn-danger"
-                                            @click="deleteTag(tag._id)">Delete</button></td>
+                                            @click="deleteTag(tag._id)">Удалить</button>
+                                    </td>
                                     <td><button type="button" class="btn btn-success"
-                                            @click="updateTag(tag._id)">Update</button>
+                                            @click="update(tag._id)">Изменить</button>
 
                                     </td>
                                 </tr>
-                                <td> <input type="text" v-model="editTag.name"></td>
                             </tbody>
                         </table>
                     </div>
