@@ -20,7 +20,7 @@ async function Login() {
   if (response && response.data && response.data.token && response.data.user) {
     authService.auth(response.data.user, response.data.token);
     router.push("/");
-    console.log("Удачная попытка");
+    alert("Удачная попытка");
   } else {
     alert("Пользователь не найден");
   }

@@ -10,8 +10,8 @@ import Modal from '@/components/Modal.vue';
 import Text from '../components/Form/Text.vue';
 
 let tags = ref([]);
-let requestItem = ref({});
 
+let requestItem = ref({});
 let createOrAddModalShow = ref(false)
 
 let authors = ref([]);

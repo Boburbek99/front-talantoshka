@@ -24,4 +24,21 @@ export default {
       console.log("Ошибка", error);
     }
   },
+
+  async updateUserData(id, password) {
+    try {
+      const response = await axios().put(`/password/${id}`, password);
+      return response;
+    } catch (error) {
+      console.log("Ошибка", error)
+    }
+  },
+  async userByData() {
+    try {
+      const response = await axios().get('/userData')
+      return response;
+    } catch (error) {
+      console.log("Ошибка", error)
+    }
+  }
 };
